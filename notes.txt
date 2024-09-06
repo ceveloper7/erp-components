@@ -1,0 +1,104 @@
+Crear un master empty project
+mvn archetype:generate -DarchetypeGroupId=org.codehaus.mojo.archetypes
+-DarchetypeArtifactId=pom-root
+-DarchetypeVersion=RELEASE
+-DgroupId=com.admiralproject
+-DartifactId=kernel
+-DinteractiveMode=false
+
+Crear un sub project
+mvn archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes
+-DarchetypeArtifactId=maven-archetype-quickstart
+-DarchetypeVersion=RELEASE
+-DgroupId=org.admiralproject.kernel
+-DartifactId=admiral-kernel-util
+-Dpackage=com.admiral.kernel.util
+-DinteractiveMode=false
+
+Compilas un modulo
+mvn clean install -Dmaven.test.skip=true
+
+org.adempiere.Adempiere.java
+============================
+validateConnectionDialog()------------------------- pending
+    Ini.java
+    ========
+    loadProperties() ------------------------------ ok
+        loadProperties(String) -------------------- ok
+            saveProperties() ---------------------- ok
+                getFileName() --------------------- ok
+                    getAdempiereHome() ------------ ok
+        getProperty(String) ----------------------- ok
+        setProperty(String, String) --------------- ok
+
+        SecureEngine.java
+        =================
+            decrypt(String) ----------------------- ok
+            encrypt(String) ----------------------- ok
+        SecureEngine.decrypt(string) -------------- ok
+            init(Properties) ---------------------- ok
+            constructor() ------------------------- ok
+            SecureInterface.java
+            ====================
+                decrypt(String) ------------------- ok
+                    Secure.java
+                    ===========
+                    decrypt() --------------------- ok
+                        convertHexString(String) -- ok
+    ADConnection.java
+    ================
+        constructor() ----------------------------- ok
+        setType() --------------------------------- ok
+        get() ------------------------------------- ok
+            get(String) --------------------------- ok
+                ADConnection.setAttributes(String)- ok
+                Ini.saveProperties()--------------- pending
+        testDatabase(boolean) --------------------- pending
+            getDatabase() ------------------------- pending
+                Database_PostgreSQL.getDataSource() pending
+                Ini.deleteProperty() -------------- pending
+            Database_PostgreSQL.close() ----------- pending
+            setDatasource() ----------------------- pending
+                Database_PostgreSQL.getDataSource() pending
+            ADConnection.getConnection(boolean, int) ------------------------- pending
+            Database_PostgreSQL.getFromConnectionPool() ---------------------- ok
+                getDataSource(ADConnection) ------- ok
+                getConnectionURL(ADConnection) ---- ok
+            readInfo(ADConnection) ---------------- ok
+
+    AdmiralDatabase.java
+    ====================
+        constructor ------------------------------- ok
+        Database.java
+        =============
+            constructor --------------------------- ok
+            DATABASE_POSTGRESQL.java
+            ========================
+                constructor() --------------------- ok
+    CConnectionDialog
+    =================
+        constructor() ----------------------------- ok
+            jbInit() ------------------------------ ok
+            setConnection() ----------------------- ok
+                ADConnection.get() ---------------- ok
+                ADConnection.clone() -------------- ok
+                ADConnection.setName() ------------ ok
+                ADConnection.getType() ------------ ok
+                ADConnection.setType() ------------ ok
+            updateInfo() -------------------------- ok
+            AdempierePLAF
+            =============
+                showCenterScreen() ---------------- ok
+                getOkButton() --------------------- ok
+                getCancelButton() ----------------- ok
+        getConnection() --------------------------- ok
+        isCancel() -------------------------------- ok
+
+
+Ini.java
+========
+loadProperties()                    ok
+    loadProperties(String)          ok
+        saveProperties()            ok
+            getFileName()           ok
+                getAdempiereHome()  ok
