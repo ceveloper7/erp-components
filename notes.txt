@@ -18,9 +18,21 @@ mvn archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes
 Compilas un modulo
 mvn clean install -Dmaven.test.skip=true
 
+validateConnectionDialog()------------------------- pending
+
 org.adempiere.Adempiere.java
 ============================
-validateConnectionDialog()------------------------- pending
+startup(boolean) __________________________________ ok
+    DB.setTarget(ADConnection) ____________________ ok
+        DB.closeTarget() __________________________ ok
+
+    startUpEnvironment(boolean) ___________________ pending
+        DB.isConnected() __________________________ ok
+            DB.isConnected(boolean) _______________ ok
+                DB.getConnectionRW() ______________ ok
+                    DB.getConnectionRW(boolean) ___ ok
+                        DB.createConnection(boolean, boolean, int) _____________________________ ok
+
     Ini.java
     ========
     loadProperties() ------------------------------ ok
@@ -53,14 +65,16 @@ validateConnectionDialog()------------------------- pending
             get(String) --------------------------- ok
                 ADConnection.setAttributes(String)- ok
                 Ini.saveProperties()--------------- pending
-        testDatabase(boolean) --------------------- pending
-            getDatabase() ------------------------- pending
-                Database_PostgreSQL.getDataSource() pending
+        testDatabase(boolean) --------------------- ok
+            getDatabase() ------------------------- ok
+                Database_PostgreSQL.getDataSource() ok
                 Ini.deleteProperty() -------------- pending
-            Database_PostgreSQL.close() ----------- pending
-            setDatasource() ----------------------- pending
-                Database_PostgreSQL.getDataSource() pending
-            ADConnection.getConnection(boolean, int) ------------------------- pending
+            Database_PostgreSQL.close() ----------- ok
+            setDatasource() ----------------------- ok
+                Database_PostgreSQL.getDataSource() ok
+            ADConnection.getConnection(boolean, int) ------------------------- ok
+                getTransactionIsolationInfo(int) __ ok
+                getConnectionURL() ________________ ok
             Database_PostgreSQL.getFromConnectionPool() ---------------------- ok
                 getDataSource(ADConnection) ------- ok
                 getConnectionURL(ADConnection) ---- ok
@@ -75,6 +89,7 @@ validateConnectionDialog()------------------------- pending
             DATABASE_POSTGRESQL.java
             ========================
                 constructor() --------------------- ok
+
     CConnectionDialog
     =================
         constructor() ----------------------------- ok
@@ -93,6 +108,7 @@ validateConnectionDialog()------------------------- pending
                 getCancelButton() ----------------- ok
         getConnection() --------------------------- ok
         isCancel() -------------------------------- ok
+
 
 
 Ini.java

@@ -1,23 +1,129 @@
 package com.admiral.base.db;
 
+import com.admiral.base.util.Ini;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class PostgreSQLDatabase implements GeneralDatabase{
+public class PostgreSQLDatabase implements AdmiralDatabase {
+    private static final Logger log = Logger.getLogger(PostgreSQLDatabase.class.getName());
+
     public static final String DRIVER = "org.postgresql.Driver";
-    private org.postgresql.Driver s_driver;
+    private org.postgresql.Driver ad_driver;
     public static final int DEFAULT_PORT = 5432;
+
+    private String ad_connection;
+    private String ad_dbName = null;
+    private String ad_userName = null;
+    private String ad_connectionUrl;
+
+    /** Data Source	Long Running 	*/
+    private DataSource datasourceLongRunning = null;
 
     public PostgreSQLDatabase() {}
 
+    public String getConnectionURL (ADConnection connection)
+    {
+        //  jdbc:postgresql://hostname:portnumber/databasename?encoding=UNICODE
+        StringBuffer sb = new StringBuffer("jdbc:postgresql:");
+        sb.append("//").append(connection.getDbHost())
+                .append(":").append(connection.getDbPort())
+                .append("/").append(connection.getDbName())
+                .append("?encoding=UNICODE");
+        ad_connection = sb.toString();
+        return ad_connection;
+    }   //  getConnectionString
+
+    public Connection getFromConnectionPool(ADConnection connection, boolean autoCommit, int transactionIsolation) throws Exception{
+        if(datasourceLongRunning == null){
+            getDataSource(connection);
+        }
+        Connection localConnection = datasourceLongRunning.getConnection();
+        if(localConnection != null){
+            localConnection.setAutoCommit(autoCommit);
+            localConnection.setTransactionIsolation(transactionIsolation);
+        }
+        return localConnection;
+    }
+
     @Override
     public Driver getDriver() throws SQLException {
-        if(s_driver == null) {
-            s_driver = new org.postgresql.Driver();
-            DriverManager.registerDriver(s_driver);
-            DriverManager.setLoginTimeout(Database.CONNECTION_TIMEOUT);
+        if(ad_driver == null) {
+            ad_driver = new org.postgresql.Driver();
+            DriverManager.registerDriver(ad_driver);
+            DriverManager.setLoginTimeout(DataBasesSupported.CONNECTION_TIMEOUT);
         }
-        return s_driver;
+        return ad_driver;
+    }
+
+    public DataSource getDataSource(ADConnection connection) {
+        if(datasourceLongRunning != null) {
+            return datasourceLongRunning;
+        }
+        try{
+            if(Ini.isClient()){
+                log.warning("Config Hikari Connection Pool Datasource");
+                HikariConfig config = new HikariConfig();
+                config.setDriverClassName(DRIVER);
+                config.setJdbcUrl(getConnectionURL(connection));
+                config.setUsername(connection.getDbUser());
+                config.setPassword(connection.getDbPass());
+                config.setConnectionTestQuery(DEFAULT_CONNECTION_TEST_QUERY);
+                config.setIdleTimeout(0);
+                config.setMinimumIdle(15);
+                config.setMaximumPoolSize(150);
+                config.setPoolName("AdempiereDS");
+                config.addDataSourceProperty( "cachePrepStmts" , "true" );
+                config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
+                config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
+                datasourceLongRunning = new HikariDataSource(config);;
+                log.warning("Starting Client Hikari Connection Pool");
+            }
+        }
+        catch(Exception exception){
+            datasourceLongRunning = null;
+            log.log(Level.SEVERE, "Application Server does not exist, no is possible to initialize the initialise Hikari Connection Pool", exception);
+            exception.printStackTrace();
+        }
+        return datasourceLongRunning;
+    }
+
+    public String toString() {
+
+        StringBuffer	sb	= new StringBuffer("DB_PostgreSQL[");
+
+        sb.append(ad_connection).append("]");
+
+        return sb.toString();
+
+    }		// toString
+
+    @Override
+    public synchronized void close() {
+        log.fine(toString());
+        if (datasourceLongRunning != null)
+        {
+            try
+            {
+                datasourceLongRunning.getConnection().close(); //m_ds.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        datasourceLongRunning = null;
+    }
+
+    @Override
+    public String getName() {
+        return "";
     }
 }

@@ -1,6 +1,6 @@
 package com.admiral.base.db;
 
-public class Database {
+public class DataBasesSupported {
     public static int CONNECTION_TIMEOUT = 10;
     public static String POSTGRESQL_DATABASE = "PostgreSQL";
 
@@ -12,11 +12,11 @@ public class Database {
             PostgreSQLDatabase.class
     };
 
-    public static GeneralDatabase getDatabase(String type) throws Exception{
-        GeneralDatabase database = null;
-        for(int i = 0; i< Database.DATABASE_NAMES.length; i++){
-            if(Database.DATABASE_NAMES[i].equals(type)){
-                database = (GeneralDatabase) Database.DATABASE_CLASSES[i].newInstance();
+    public static AdmiralDatabase getDatabase(String type) throws Exception{
+        AdmiralDatabase database = null;
+        for(int i = 0; i< DataBasesSupported.DATABASE_NAMES.length; i++){
+            if(DataBasesSupported.DATABASE_NAMES[i].equals(type)){
+                database = (AdmiralDatabase) DataBasesSupported.DATABASE_CLASSES[i].newInstance();
             }
             break;
         }

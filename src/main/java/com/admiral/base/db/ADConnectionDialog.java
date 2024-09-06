@@ -30,7 +30,7 @@ public class ADConnectionDialog extends JDialog implements ActionListener {
     private JLabel nameLabel = new JLabel();
     private JTextField nameField = new JTextField();
     private JLabel dbTypeLabel = new JLabel();
-    private JComboBox dbTypeField = new JComboBox(Database.DATABASE_NAMES);
+    private JComboBox dbTypeField = new JComboBox(DataBasesSupported.DATABASE_NAMES);
     private JLabel hostLabel = new JLabel();
     private JTextField hostField = new JTextField();
     private JLabel portLabel = new JLabel();
@@ -55,17 +55,17 @@ public class ADConnectionDialog extends JDialog implements ActionListener {
         nameField.setColumns(30);
         nameField.setEditable(false);
 
-        dbTypeLabel.setText("Database Type");
-        hostLabel.setText("Database Host");
+        dbTypeLabel.setText("DataBasesSupported Type");
+        hostLabel.setText("DataBasesSupported Host");
         hostField.setColumns(30);
-        portLabel.setText("Database Port");
+        portLabel.setText("DataBasesSupported Port");
         dbPortField.setColumns(10);
-        sidLabel.setText("Database Name");
+        sidLabel.setText("DataBasesSupported Name");
         sidField.setColumns(30);
         dbUidLabel.setText("User/Password");
         dbUidField.setColumns(10);
 
-        bTestDB.setText("Test Database");
+        bTestDB.setText("Test DataBasesSupported");
         bTestDB.setHorizontalAlignment(JLabel.LEFT);
 
         this.getContentPane().add(mainPanel, BorderLayout.CENTER);
@@ -135,11 +135,27 @@ public class ADConnectionDialog extends JDialog implements ActionListener {
         AdmiralPLAF.showCenterScreen(this);
     }
 
+    private void updateInfo(){
+        m_updating = true;
+        nameField.setText(m_cc.getDbName());
+
+        dbTypeField.setSelectedItem(m_cc.getDbType());
+        hostField.setText(m_cc.getDbHost());
+        dbPortField.setText(m_cc.getDbPort());
+        sidField.setText(m_cc.getDbName());
+
+        dbUidField.setText(m_cc.getDbUser());
+        dbPwdField.setText(m_cc.getDbPass());
+
+        // TODO: bTestDB.setToolTipText(m_cc.getConnectionURL());
+        bTestDB.setIcon(getStatusIcon(m_cc.isDatabaseOK()));
+        m_updating = false;
+    }
+
     public void setConnection(ADConnection cc){
         m_cc = cc;
         if (m_cc == null) {
             m_cc = ADConnection.get();
-            m_cc.setName();
         }
         try{
             m_ccResult = (ADConnection) m_cc.clone();
@@ -147,12 +163,12 @@ public class ADConnectionDialog extends JDialog implements ActionListener {
         catch (CloneNotSupportedException e){
             e.printStackTrace();
         }
-        String type = m_cc.getType();
+        String type = m_cc.getDbType();
         if(type == null || type.isEmpty()){
             dbTypeField.setSelectedItem(null);
         }
         else{
-            m_cc.setType(m_cc.getType());
+            m_cc.setDbType(m_cc.getDbType());
         }
         updateInfo();
     }
