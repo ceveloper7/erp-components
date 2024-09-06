@@ -2,7 +2,7 @@ package com.admiral.base.util;
 
 import com.admiral.base.util.secure.SecureEngine;
 import com.admiral.base.util.secure.SecureInterface;
-import com.admiral.components.base.util.secure.*;
+import com.admiral.base.util.secure.*;
 
 import java.io.*;
 import java.util.Properties;
@@ -58,16 +58,19 @@ public final class Ini implements Serializable {
         // server
         if((!s_client && base == null) || base.length() == 0){
             String home = getAdmiralHome();
-            if(home != null){
+            if(home != null) {
                 base = home;
             }
-            if(base != null && !base.endsWith(File.separator)){
-                base += File.separator;
-            }
-            if(base == null) {
-                base = "";
-            }
         }
+
+        if(base != null && !base.endsWith(File.separator)){
+            base += File.separator;
+        }
+
+        if(base == null) {
+            base = "";
+        }
+
         return base + ADMIRAL_PROPERTY_FILE;
     }
 

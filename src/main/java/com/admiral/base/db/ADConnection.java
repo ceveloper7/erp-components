@@ -1,5 +1,6 @@
 package com.admiral.base.db;
 
+import com.admiral.base.Admiral;
 import com.admiral.base.util.secure.SecureEngine;
 import com.admiral.base.util.Ini;
 
@@ -358,5 +359,47 @@ public class ADConnection {
             log.log(Level.SEVERE, getConnectionURL(), ex);
         }
         return connection;
+    }
+
+    public String toStringDetail ()
+    {
+        StringBuffer sb = new StringBuffer ();
+        sb.append ("{").append (dbHost)
+                .append ("-").append (dbName)
+                .append ("-").append (dbUser)
+                .append ("}");
+        //
+        Connection conn = getConnection (true,
+                Connection.TRANSACTION_READ_COMMITTED);
+        if (conn != null)
+        {
+            try
+            {
+                DatabaseMetaData dbmd = conn.getMetaData ();
+                sb.append("\nDatabase=" + dbmd.getDatabaseProductName ()
+                        + " - " + dbmd.getDatabaseProductVersion());
+                sb.append("\nDriver  =" + dbmd.getDriverName ()
+                        + " - " + dbmd.getDriverVersion ());
+                if (isDataSource())
+                    sb.append(" - via DS");
+                conn.close ();
+            }
+            catch (Exception e)
+            {
+            }
+        }
+        conn = null;
+        return sb.toString ();
+    } 	//  toStringDetail
+
+    public static void main(String[] args) {
+        Admiral.startup(true);
+        System.out.println("Connection = ");
+
+        System.out.println(Ini.getProperty(Ini.P_CONNECTION));
+        ADConnection cc = ADConnection.get();
+        System.out.println(">> " + cc.toStringDetail());
+
+        //Connection con = cc.getConnection(false, Connection.TRANSACTION_READ_COMMITTED);
     }
 }
