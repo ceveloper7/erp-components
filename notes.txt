@@ -26,7 +26,7 @@ startup(boolean) __________________________________ ok
     DB.setTarget(ADConnection) ____________________ ok
         DB.closeTarget() __________________________ ok
 
-    startUpEnvironment(boolean) ___________________ pending
+    startUpEnvironment(boolean) ___________________ ok
         DB.isConnected() __________________________ ok
             DB.isConnected(boolean) _______________ ok
                 DB.getConnectionRW() ______________ ok
@@ -79,6 +79,7 @@ startup(boolean) __________________________________ ok
                 getDataSource(ADConnection) ------- ok
                 getConnectionURL(ADConnection) ---- ok
             readInfo(ADConnection) ---------------- ok
+        main() ____________________________________ ok
 
     AdmiralDatabase.java
     ====================
@@ -94,6 +95,11 @@ startup(boolean) __________________________________ ok
     =================
         constructor() ----------------------------- ok
             jbInit() ------------------------------ ok
+            actionPerformed(ActionEvent) __________ ok
+                updateADConnection() ______________ ok
+                updateInfo() ______________________ ok
+                cmd_testDB() ______________________ ok
+                    setBusy() _____________________ ok
             setConnection() ----------------------- ok
                 ADConnection.get() ---------------- ok
                 ADConnection.clone() -------------- ok

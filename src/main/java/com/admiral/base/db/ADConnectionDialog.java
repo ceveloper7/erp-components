@@ -1,11 +1,13 @@
 package com.admiral.base.db;
 
+import com.admiral.base.util.Ini;
 import com.admiral.client.plaf.AdmiralPLAF;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -147,9 +149,28 @@ public class ADConnectionDialog extends JDialog implements ActionListener {
         dbUidField.setText(m_cc.getDbUser());
         dbPwdField.setText(m_cc.getDbPass());
 
-        // TODO: bTestDB.setToolTipText(m_cc.getConnectionURL());
+        bTestDB.setToolTipText(m_cc.getConnectionURL());
         bTestDB.setIcon(getStatusIcon(m_cc.isDatabaseOK()));
         m_updating = false;
+    }
+
+    private void updateADConnection(){
+        if(Ini.isClient()){
+            if(!hostField.getText().equals(m_cc.getDbHost())){
+                m_cc.setAppHost(hostField.getText());
+            }
+        }
+        else{
+            m_cc.setAppHost("localhost");
+        }
+
+        //
+        m_cc.setDbType((String) dbTypeField.getSelectedItem());
+        m_cc.setDbHost(hostField.getText());
+        m_cc.setDbPort(dbPortField.getText());
+        m_cc.setDbName(sidField.getText());
+        m_cc.setDbUser(dbUidField.getText());
+        m_cc.setDbPass(String.valueOf(dbPwdField.getPassword()));
     }
 
     public void setConnection(ADConnection cc){
@@ -157,12 +178,9 @@ public class ADConnectionDialog extends JDialog implements ActionListener {
         if (m_cc == null) {
             m_cc = ADConnection.get();
         }
-        try{
-            m_ccResult = (ADConnection) m_cc.clone();
-        }
-        catch (CloneNotSupportedException e){
-            e.printStackTrace();
-        }
+
+        m_ccResult = m_cc;
+
         String type = m_cc.getDbType();
         if(type == null || type.isEmpty()){
             dbTypeField.setSelectedItem(null);
@@ -190,8 +208,63 @@ public class ADConnectionDialog extends JDialog implements ActionListener {
             return bCancel.getIcon();
     }   //  getStatusIcon
 
+    private void setBusy(boolean busy){
+        if(busy){
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        }else{
+            this.setCursor(Cursor.getDefaultCursor());
+        }
+        m_updating = busy;
+    }
+
+    private void cmd_testDB(){
+        setBusy(true);
+        Exception e = m_cc.testDatabase();
+
+        if(e != null){
+            JOptionPane.showMessageDialog(ADConnectionDialog.this, e.getMessage(), "Connection Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        setBusy(false);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
+        if(m_updating)
+            return;
+        Object	src	= e.getSource();
 
+        if(src == bOK){
+            m_cc.setName();
+            m_ccResult = m_cc;
+            dispose();
+            return;
+        }else if(src == bCancel){
+            m_cc.setName();
+            dispose();
+            return;
+        }else if(src == dbTypeField){
+            if(dbTypeField.getSelectedItem() == null){
+                return;
+            }
+
+            if(m_cc.getDbType() != (String)dbTypeField.getSelectedItem()){
+                m_cc.setDbType((String)dbTypeField.getSelectedItem());
+                // todo m_cc.setDatabaseDefaults()
+            }
+
+            dbPortField.setText(String.valueOf(m_cc.getDbPort()));
+        }
+
+        updateADConnection();
+        if(src == bTestDB){
+            cmd_testDB();
+        }
+
+        if(src == nameField){
+            m_cc.setName(nameField.getText());
+        }
+
+        updateInfo();
     }
 }

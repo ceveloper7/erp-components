@@ -17,7 +17,8 @@ public class ADConnection {
     private static ADConnection ad_cc = null;
     // connection name
     private String adName = "Admiral";
-    private String	dbName;
+    private String appHost = "localhost";
+    private String dbName;
     private String	dbType;
     private String	dbPort;
     private String	dbHost;
@@ -39,7 +40,21 @@ public class ADConnection {
         return ad_okDB;
     } 	//  isDatabaseOK
 
+    public String getAppHost(){
+        return appHost;
+    }
+
+    public void setAppHost(String appHost){
+        this.appHost = appHost;
+        adName = toString();
+        ad_okDB = false;
+    }
+
     protected void setName(){
+        this.adName = toString();
+    }
+
+    public void setName(String name){
         this.adName = toString();
     }
 
@@ -125,9 +140,11 @@ public class ADConnection {
                 String[] pairComponents = pair.split("[=]");
                 String key = pairComponents[0];
                 String value = pairComponents.length == 2 ? unescape(pairComponents[1]) : "";
-                if("DBName".equalsIgnoreCase(key)){
+                if("AppHost".equalsIgnoreCase(key)){
+                    setAppHost(value);
+                }else if("DBName".equalsIgnoreCase(key)){
                     setDbName(value);
-                } else if ("type".equalsIgnoreCase(key)) {
+                }else if ("type".equalsIgnoreCase(key)) {
                     setDbType(value);
                 }else if("DBPort".equalsIgnoreCase(key)){
                     setDbPort(value);
@@ -361,9 +378,23 @@ public class ADConnection {
         return connection;
     }
 
+    /*************************************************************************
+     *  Short String representation
+     *  @return appsHost{dbHost-dbName-uid}
+     */
+    public String toString ()
+    {
+        StringBuffer sb = new StringBuffer (appHost);
+        sb.append ("{").append (dbHost)
+                .append ("-").append (dbName)
+                .append ("-").append (dbUser)
+                .append ("}");
+        return sb.toString ();
+    } 	//  toString
+
     public String toStringDetail ()
     {
-        StringBuffer sb = new StringBuffer ();
+        StringBuffer sb = new StringBuffer (appHost);
         sb.append ("{").append (dbHost)
                 .append ("-").append (dbName)
                 .append ("-").append (dbUser)
@@ -396,10 +427,11 @@ public class ADConnection {
         Admiral.startup(true);
         System.out.println("Connection = ");
 
-        System.out.println(Ini.getProperty(Ini.P_CONNECTION));
+        System.out.println("This is Ini.P_CONNECTION ->>>>>" + Ini.getProperty(Ini.P_CONNECTION));
         ADConnection cc = ADConnection.get();
         System.out.println(">> " + cc.toStringDetail());
 
-        //Connection con = cc.getConnection(false, Connection.TRANSACTION_READ_COMMITTED);
+        Connection con = cc.getConnection(false, Connection.TRANSACTION_READ_COMMITTED);
+        new ADConnectionDialog(cc);
     }
 }
