@@ -162,6 +162,19 @@ public class ADConnection {
         }
     }
 
+    public String toStringLong(){
+        StringBuffer sb = new StringBuffer ("CConnection[");
+        sb.append("name=").append(adName)
+                .append (",type=").append (dbType)
+                .append (",DBhost=").append (dbHost)
+                .append (",DBport=").append (dbPort)
+                .append (",DBname=").append (dbName)
+                .append (",UID=").append (dbUser)
+                .append (",PWD=").append (dbPass);
+        sb.append ("]");
+        return sb.toString ();
+    }
+
     public static ADConnection get(String ad_apps_host){
         if(ad_cc == null){
             String attributes = Ini.getProperty(Ini.P_CONNECTION);
@@ -173,7 +186,7 @@ public class ADConnection {
                 ad_cc = new ADConnection();
                 ad_cc.setAttributes(attributes);
                 log.fine(ad_cc.toString());
-                Ini.setProperty(Ini.P_CONNECTION, ad_cc.toString());
+                Ini.setProperty(Ini.P_CONNECTION, ad_cc.toStringLong());
                 // TODO: Ini.saveProperties(Ini.isClient());
             }else{
                 ad_cc = new ADConnection();
@@ -209,9 +222,9 @@ public class ADConnection {
                         break;
                     }
                 }
-                if(ad_db != null){
-                    ad_db.getDataSource(this);
-                }
+//                if(ad_db != null){
+//                    ad_db.getDataSource(this);
+//                }
             }
             catch(Exception e){
                 log.severe(e.toString());
@@ -328,7 +341,7 @@ public class ADConnection {
         try{
             Exception ee = null;
             try{
-                connection = ad_db.getFromConnectionPool(this, autoCommit, transactionIsolation);
+                connection = ad_db.getCachedConnection(this, autoCommit, transactionIsolation);
             }
             catch(Exception exception){
                 log.severe(exception.getMessage());
@@ -427,7 +440,7 @@ public class ADConnection {
         Admiral.startup(true);
         System.out.println("Connection = ");
 
-        System.out.println("This is Ini.P_CONNECTION ->>>>>" + Ini.getProperty(Ini.P_CONNECTION));
+        System.out.println(Ini.getProperty(Ini.P_CONNECTION));
         ADConnection cc = ADConnection.get();
         System.out.println(">> " + cc.toStringDetail());
 

@@ -121,6 +121,9 @@ Ini.java
 ========
 loadProperties()                    ok
     loadProperties(String)          ok
+        checkProperties(String)     pending
+            Secure.encrypt(String)  ok
+                convertToHexString() ok
         saveProperties()            ok
             getFileName()           ok
                 getAdempiereHome()  ok

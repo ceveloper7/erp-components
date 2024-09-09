@@ -32,7 +32,7 @@ public interface AdmiralDatabase {
      *	@return connection or null
      *  @throws Exception
      */
-    public Connection getFromConnectionPool(ADConnection connection,
+    public Connection getCachedConnection(ADConnection connection,
                                             boolean autoCommit, int transactionIsolation) throws Exception;
 
     /**

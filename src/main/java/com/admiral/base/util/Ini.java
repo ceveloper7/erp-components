@@ -16,7 +16,20 @@ public final class Ini implements Serializable {
     private static final String ADMIRAL_PROPERTY_FILE = "admiral.properties";
     private static final String ADMIRAL_HOME = "ADMIRAL_HOME";
     private static final String ENV_PREFIX = "env.";
+
     public static final String P_CONNECTION = "Connection";
+    private static final String	DEFAULT_CONNECTION = "";
+
+    private static final String[] PROPERTIES = new String[] {
+            P_CONNECTION
+    };
+    private static final String[]   VALUES = new String[]{
+            DEFAULT_CONNECTION
+    };
+
+    private static final String	P_WARNING	= "Warning";
+    private static final String	DEFAULT_WARNING	= "Do_not_change_any_of_the_data_as_they_will_have_undocumented_side_effects.";
+    private static final String	P_WARNING_de	= "WarningD";
 
     private static boolean s_client = true;
     private static boolean isLoaded = false;
@@ -119,7 +132,12 @@ public final class Ini implements Serializable {
             loaded = false;
         }
 
-        if(!loaded || firstTime){
+        if(!loaded ){
+            firstTime = true;
+            checkProperties();
+        }
+
+        if(!loaded){
             saveProperties(true);
         }
 
@@ -134,6 +152,7 @@ public final class Ini implements Serializable {
         if (key == null)
             return "";
         String retStr = admiralProperties.getProperty(key, "");
+
         if (retStr == null || retStr.length() == 0)
             return "";
         //
@@ -163,5 +182,27 @@ public final class Ini implements Serializable {
                 }
             }
         }
+    }
+
+    private static void checkProperties(){
+        for (int i = 0; i < PROPERTIES.length; i++)
+        {
+            if (VALUES[i].length() > 0)
+                checkProperty(PROPERTIES[i], VALUES[i]);
+        }
+    }
+
+    private static String checkProperty(String key, String defaultValue){
+        String result;
+        if (key.equals(P_WARNING) || key.equals(P_WARNING_de)) {
+            result	= defaultValue;
+        } else if (!isClient()) {
+            result	= admiralProperties.getProperty(key, SecureInterface.CLEARVALUE_START + defaultValue + SecureInterface.CLEARVALUE_END);
+        } else {
+            result	= admiralProperties.getProperty(key, SecureEngine.encrypt(defaultValue));
+        }
+        admiralProperties.setProperty(key, result);
+
+        return result;
     }
 }
